@@ -1,0 +1,15 @@
+/.idea/
+node_modules/
+
+uploads/*
+.env
+.env.example
+cloud_sql_proxy
+
+uploads/
+
+bin/build
+
+ngrok
+
+.DS_Store
