@@ -5,11 +5,15 @@ export type TAPIResponse<T = Record<string, any>> = {
     data?: T;
 };
 
-export type TPaginatedResponse<T = Record<string, any>> = TAPIResponse<T> & {
-    pagination?: {
-        total: number;
+interface TPaginatedResult<T> {
+    data: T[];
+    meta: {
         page: number;
-        pageSize: number;
+        limit: number;
+        total: number;
         totalPages: number;
-    }
-};
+    };
+}
+
+export type TPaginatedResponse<T = Record<string, any>> =
+    TAPIResponse<TPaginatedResult<T>>

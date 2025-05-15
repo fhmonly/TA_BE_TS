@@ -5,6 +5,8 @@ declare namespace NodeJS {
         PORT: string;
         ALLOWED_ORIGIN: string;
 
+        PYTHON_API_HOST: string;
+
         DB_CONNECTION: 'mysql' | string;
         DB_HOST: string;
         DB_PORT: string;
