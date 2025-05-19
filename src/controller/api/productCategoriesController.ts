@@ -1,94 +1,99 @@
-import express, { NextFunction, Request, Response } from 'express';
-import { body, matchedData, param } from 'express-validator';
-import createHttpError from 'http-errors';
-import { product_categories } from '../../database/models';
-import expressValidatorErrorHandler from '../../middleware/expressValidatorErrorHandler';
+import { body, matchedData, param } from "express-validator";
+import expressValidatorErrorHandler from "../../middleware/expressValidatorErrorHandler";
+import { NextFunction, Request, Response } from "express";
+import { IProductCategoryTable } from "../../types/db-model";
+import { createProductCategory, deleteProductCategory, showAllProductCategory, updateProductCategoryById } from "../../services/productCategoryServices";
+import createHttpError from "http-errors";
+import { TAPIResponse } from "../../types/core/http";
 
-const router = express.Router();
-
-// POST: Tambah kategori baru
-const createCategory = [
-    body("category_name").notEmpty().withMessage("Category name is required"),
-    body("description").optional().isString(),
-    body("user_id").notEmpty().withMessage("User ID is required").isMongoId(),
+const addProductCategory = [
+    body("category_name").notEmpty().isString(),
     expressValidatorErrorHandler,
     async (req: Request, res: Response, next: NextFunction) => {
+        const reqBody = matchedData<IProductCategoryTable>(req)
         try {
-            const data = matchedData(req);
-            const category = new product_categories(data);
-            await category.save();
-            res.status(201).json({ message: "Category created", category });
-        } catch (err) {
-            next(createHttpError(500, "Internal Server Error", { cause: err }));
+            const newProductId = await createProductCategory({
+                ...reqBody,
+                category_name: reqBody.category_name.toLowerCase(),
+                user_id: req.user!.id
+            })
+            const result: TAPIResponse = {
+                success: true,
+                message: 'New product category successfully created.',
+                data: {
+                    productCategoryId: newProductId
+                }
+            }
+            res.json(result)
+        } catch (error: unknown) {
+            next(createHttpError(500, error as Error))
         }
-    }
-];
 
-// PATCH: Perbarui kategori
-const updateCategory = [
-    param("id").isMongoId().withMessage("Invalid category ID"),
-    body("category_name").optional().isString(),
-    body("description").optional().isString(),
-    expressValidatorErrorHandler,
+    }
+]
+
+const getProductCategories = [
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id } = req.params;
-            const data = matchedData(req);
-            const category = await product_categories.findByIdAndUpdate(id, data, { new: true });
-            if (!category) return next(createHttpError(404, "Category not found"));
-            res.json({ message: "Category updated", category });
-        } catch (err) {
-            next(createHttpError(500, "Internal Server Error", { cause: err }));
+            const productCategories = await showAllProductCategory(req.user!.id)
+            console.log(productCategories)
+            const result: TAPIResponse = {
+                success: true,
+                data: productCategories
+            }
+            res.json(result)
+        } catch (error) {
+            next(createHttpError(500, error as Error))
         }
     }
 ]
 
-// DELETE: Hapus kategori
-const deleteCategory = [
-    param("id").isMongoId().withMessage("Invalid category ID"),
+const deleteProductCategoryRoute = [
+    param('id'),
     expressValidatorErrorHandler,
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id } = req.params;
-            const category = await product_categories.findByIdAndDelete(id);
-            if (!category) return next(createHttpError(404, "Category not found"));
-            res.json({ message: "Category deleted" });
-        } catch (err) {
-            next(createHttpError(500, "Internal Server Error", { cause: err }));
+            const { id } = matchedData(req)
+            await deleteProductCategory(id, req.user!.id)
+            const result: TAPIResponse = {
+                success: true,
+                message: 'Product category successfully deleted'
+            }
+            res.json(result)
+        } catch (error) {
+            next(createHttpError(500, error as Error))
         }
     }
 ]
 
-// GET: Ambil satu kategori berdasarkan ID
-const getCategory = [
-    param("id").isMongoId().withMessage("Invalid category ID"),
+const updateProductCategory = [
+    param("id").notEmpty(),
+    body("category_name").notEmpty(),
     expressValidatorErrorHandler,
     async (req: Request, res: Response, next: NextFunction) => {
+        const reqParam = matchedData(req, { locations: ['params'] })
+        const reqBody = matchedData<IProductCategoryTable>(req, { locations: ['body'] })
         try {
-            const { id } = req.params;
-            const category = await product_categories.findById(id);
-            if (!category) return next(createHttpError(404, "Category not found"));
-            res.json(category);
-        } catch (err) {
-            next(createHttpError(500, "Internal Server Error", { cause: err }));
+            const newProductId = await updateProductCategoryById(reqParam.id, {
+                ...reqBody,
+                category_name: reqBody.category_name.toLowerCase()
+            })
+            const result: TAPIResponse = {
+                success: true,
+                message: 'Product category successfully updated.',
+                data: {
+                    productCategoryId: newProductId
+                }
+            }
+            res.json(result)
+        } catch (error: unknown) {
+            next(createHttpError(500, error as Error))
         }
+
     }
 ]
 
-// GET: Ambil semua kategori
-const getCategories = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const categories = await product_categories.find();
-        res.json(categories);
-    } catch (err) {
-        next(createHttpError(500, "Internal Server Error", { cause: err }));
-    }
-}
 
 export default {
-    createCategory,
-    updateCategory,
-    deleteCategory,
-    getCategory,
-    getCategories,
-};
+    addProductCategory, getProductCategories, deleteProductCategoryRoute
+}

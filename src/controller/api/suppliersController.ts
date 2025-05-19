@@ -10,18 +10,19 @@ import parsePhoneNumberFromString from "libphonenumber-js"
 const addSupplier = [
     body('supplier_name').notEmpty().isString(),
     body('contact')
-        .optional({ nullable: true })
+        .optional({ values: 'falsy' })
         .isNumeric({ no_symbols: true }).withMessage('Contact must contain only digits (0-9), no symbols allowed'),
     body('address').optional().isString(),
     expressValidatorErrorHandler,
     async (req: Request, res: Response, next: NextFunction) => {
         const reqData = matchedData<ISupplierTable>(req)
         const phone = parsePhoneNumberFromString(`+${reqData.contact}`);
-        if (!phone?.isValid())
-            next(createHttpError(400, 'Invalid phone number format. Please match international format.'))
+        if (!phone?.isValid() && !!reqData.contact)
+            return next(createHttpError(400, 'Invalid phone number format. Please match international format.'))
         try {
             const newSupplierId = await createSupplier({
                 ...reqData,
+                contact: reqData.contact || null,
                 user_id: req.user!.id
             })
             const result: TAPIResponse = {
@@ -78,7 +79,7 @@ const updateSupplierRoute = [
     param('id'),
     body('supplier_name').notEmpty().isString(),
     body('contact')
-        .optional({ nullable: true })
+        .optional({ values: 'falsy' })
         .isNumeric({ no_symbols: true }).withMessage('Contact must contain only digits (0-9), no symbols allowed'),
     body('address').optional().isString(),
     expressValidatorErrorHandler,
@@ -87,9 +88,12 @@ const updateSupplierRoute = [
             const { id } = matchedData(req, { locations: ['params'] })
             const reqBody = matchedData<ISupplierTable>(req, { locations: ['body'] })
             const phone = parsePhoneNumberFromString(`+${reqBody.contact}`);
-            if (!phone?.isValid())
-                next(createHttpError(400, 'Invalid phone number format. Please match international format.'))
-            await updateSupplier(id, reqBody)
+            if (!phone?.isValid() && !!reqBody.contact)
+                return next(createHttpError(400, 'Invalid phone number format. Please match international format.'))
+            await updateSupplier(id, {
+                ...reqBody,
+                contact: reqBody.contact || null
+            })
             const result: TAPIResponse = {
                 success: true,
                 message: 'Supplier data successfully updated'

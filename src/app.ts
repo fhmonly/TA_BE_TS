@@ -10,31 +10,40 @@ import helmet from 'helmet';
 import compression from 'compression';
 import cors from 'cors';
 
-// import internalRouter from './routes/internal';
 import apiRouter from './routes/api';
 import connectDB from './database/MySQL';
 import { root_path } from './utils/core/storage';
 import { respondWithError } from './middleware/core/errorHandler';
-// import schedule from 'node-schedule';
+import { getLocalIP } from './dev-core';
 
 const app = express();
 
-// Middleware
-const allowedOrigins = ['http://localhost:3000', 'https://myapp.com'];
+const localIP = getLocalIP()
 
-app.use(cors({
+// 🚨 1. Setup Allowed Origins
+const allowedOrigins = ['http://localhost:3000', 'https://myapp.com', `http://${localIP}:3000`];
+
+const corsOptions: cors.CorsOptions = {
   origin(origin, callback) {
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error('Not allowed by CORS'));
-    }
+    if (!origin) return callback(null, true); // Allow server-to-server or curl
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
   },
-  credentials: true
-}));
+  credentials: true,
+};
 
+// 🚨 2. Pasang CORS Middleware DULUAN
+app.use(cors(corsOptions));
+// 💡 3. Handle all OPTIONS preflight
+app.options('*', cors(corsOptions));
+
+// 🔍 4. Logging semua request (termasuk OPTIONS)
+app.use((req, _res, next) => {
+  console.log(`[${req.method}] ${req.originalUrl}`);
+  next();
+});
+
+// 💨 Middleware lain
 app.use(compression());
 app.use(helmet());
 app.use(logger('dev'));
@@ -43,40 +52,35 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// View engine setup
-// app.set('views', path.join(__dirname, 'views'));
+// 🖼️ View engine
 app.set('views', root_path('src/views'));
 app.set('view engine', 'ejs');
 
-// Database connection
+// 🔌 DB connection
 connectDB();
 
-app.get('/', function (req, res, next) {
+// ✅ Basic endpoint untuk cek server hidup
+app.get('/', function (req, res) {
   res.json({
     status: 'running',
     developer: 'Fahim',
-    project: 'Stock Prediction with ARIMA'
+    project: 'Stock Prediction with ARIMA',
   });
 });
 
+// 🔗 API Router
 app.use('/api', apiRouter);
 
-// 404 handler (opsional, bisa diaktifkan jika perlu)
-// app.use((_req, _res, next) => {
-//   next(createHttpError(404));
-// });
+// 🚨 5. Tangani CORS error secara eksplisit
+app.use(((err: Error, req: Request, res: Response, next: NextFunction) => {
+  if (err.message === 'Not allowed by CORS') {
+    console.error('❌ CORS error:', req.headers.origin);
+    return res.status(403).json({ error: 'CORS policy does not allow this origin.' });
+  }
+  next(err);
+}) as express.ErrorRequestHandler);
 
-// Scheduler (opsional, jika ingin dijalankan otomatis)
-// const scheduleMidnight = schedule.scheduleJob('0 0 * * *', async () => {
-//   const result = await runningSchedule() ? 'success running midnight schedule' : 'failed running midnight schedule';
-//   console.log(result);
-// });
-
-// const scheduleNoon = schedule.scheduleJob('0 12 * * *', async () => {
-//   const result = await runningSchedule() ? 'success running noon schedule' : 'failed running noon schedule';
-//   console.log(result);
-// });
-
+// ❗ 6. Global error handler (dari kamu)
 app.use(respondWithError);
 
 export default app;

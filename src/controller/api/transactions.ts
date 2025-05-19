@@ -4,7 +4,7 @@ import { body, param, matchedData } from "express-validator";
 import createHttpError from "http-errors";
 import validate from "../../middleware/expressValidatorErrorHandler";  // Validation middleware
 import * as transactionsRepository from "../../repository/transaction"; // Repository untuk Transactions dalam bentuk mongoose
-import * as productsRepository from "../../repository/products"; // Untuk cek produk
+import * as productsRepository from "../../repository/productsRepository"; // Untuk cek produk
 import { NextFunction, Request, Response } from "express";
 import { ITransaction } from "../../types/db-model";
 

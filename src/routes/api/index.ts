@@ -3,15 +3,9 @@ var router = express.Router();
 
 import authEndpoint from './auth'
 import supplierEndpoint from './supplier'
+import productCategoryEndpoint from './product_category'
+import productEndpoint from './product'
 import authenticate from '../../middleware/authMiddleware';
-// import productCategory from '../../controller/api/productCategoriesController';
-// import product from '../../controller/api/productsController';
-// import stockForecastingController from '../../controller/api/stockForecasting';
-// import stockPurchaseController from '../../controller/api/stockPurchases';
-// import supplierController from '../../controller/api/suppliers';
-// import transactionController from '../../controller/api/transactions';
-// import userFileController from '../../controller/api/userFiles';
-// const {jwtInfluencerMiddleware} = require("../middleware/authMiddleware");
 
 router.get('/', function (req, res, next) {
     res.send('Read docs.');
@@ -27,5 +21,7 @@ router.get('/is-authenticated', (req, res) => {
 })
 
 router.use('/', supplierEndpoint)
+router.use('/', productEndpoint)
+router.use('/', productCategoryEndpoint)
 
 export default router;

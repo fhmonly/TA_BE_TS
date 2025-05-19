@@ -13,22 +13,24 @@ export interface IProductCategoryTable {
     user_id: number;
     category_name: string;
     id: number;
-    description: string;
 }
 
 export interface IProductTable {
     id: number;
     product_name: string;
+    product_code: string;
     stock: number;
-    price: number;
+    buying_price: number | null;
+    selling_price: number | null;
+    product_category_id: number | null;
     user_id: number;
-    product_category_id: number;
+    deleted: boolean
 }
 
 export interface ISupplierTable {
     id: number;
     supplier_name: string;
-    contact: string;
+    contact: string | null;
     address: string;
     user_id: number;
 }
