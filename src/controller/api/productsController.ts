@@ -38,7 +38,8 @@ const addProduct = [
                 success: true,
                 message: 'New product successfully created.',
                 data: {
-                    productId: newProductId
+                    ...reqData,
+                    id: newProductId,
                 }
             }
             res.json(result)
@@ -86,8 +87,8 @@ const getProductDetail = [
 
 const updateProductRoute = [
     param('id').notEmpty(),
-    body('product_code').notEmpty().isString(),
-    body('product_name').notEmpty().isString(),
+    body('product_code').optional({ values: 'falsy' }).isString(),
+    body('product_name').optional({ values: 'falsy' }).isString(),
     body('stock')
         .optional({ values: 'falsy' })
         .isNumeric({ no_symbols: true }).withMessage('Contact must contain only digits (0-9), no symbols allowed'),
@@ -105,16 +106,11 @@ const updateProductRoute = [
         try {
             const { id } = matchedData(req, { locations: ['params'] })
             const reqBody = matchedData<IProductTable>(req, { locations: ['body'] })
-            await updateProductById(id, {
-                ...reqBody,
-                buying_price: reqBody.buying_price || null,
-                selling_price: reqBody.selling_price || null,
-                stock: reqBody.stock || 0,
-                product_category_id: reqBody.product_category_id || null,
-            })
+            await updateProductById(id, reqBody)
             const result: TAPIResponse = {
                 success: true,
-                message: 'Product data successfully updated'
+                message: 'Product data successfully updated',
+                data: await showProductById(id)
             }
             res.json(result)
         } catch (error) {

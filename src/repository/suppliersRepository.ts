@@ -22,7 +22,6 @@ export const getAllSupplier = (user_id: number, limit: number, offset: number) =
         .offset(offset);
 }
 
-
 export const countSuppliers = async (id_user: number) => {
     const result = await db('suppliers')
         .where({ user_id: id_user })
@@ -33,7 +32,6 @@ export const countSuppliers = async (id_user: number) => {
 
     return parseInt(result?.count || '0');
 };
-
 
 export const updateSupplierById = (id: number, data: ISupplierTable) => {
     return getSupplierById(id).update(data)

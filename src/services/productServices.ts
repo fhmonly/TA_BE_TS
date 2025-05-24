@@ -1,4 +1,4 @@
-import { countProducts, getAllProducts, insertProduct, selectProductById, selectProductByProductCode, selectProductsByUserId } from "../repository/productsRepository"
+import { countProducts, getAllProducts, insertProduct, selectProductById, selectProductByProductCode, selectProductByProductCodes, selectProductsByUserId } from "../repository/productsRepository"
 import { IProductTable } from "../types/db-model"
 
 export const createProduct = async (data: IProductTable) => {
@@ -46,3 +46,8 @@ export const getProductByProductCode = (
     user_id: IProductTable['user_id'],
     product_code: IProductTable['product_code']
 ) => selectProductByProductCode(product_code, user_id).first()
+
+export const getProductByProductCodes = (
+    user_id: IProductTable['user_id'],
+    product_codes: IProductTable['product_code'][]
+) => selectProductByProductCodes(product_codes, user_id)

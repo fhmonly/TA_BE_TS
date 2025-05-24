@@ -39,6 +39,7 @@ export interface IPurchaseTable {
     id: number;
     buying_date: Date;
     amount: number;
+    price: number;
     total_price: number;
     user_id: number;
     product_id: number;
@@ -52,6 +53,7 @@ export interface ITransactionTable {
     total_price: number;
     user_id: number;
     product_id: number;
+    price: number
 }
 
 export interface IPredictionTable {

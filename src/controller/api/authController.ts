@@ -191,13 +191,13 @@ const login = [
             await updateUserById(user.id, {
                 refresh_token: refreshToken
             })
-
+            const isProd = process.env.NODE_ENV === 'production';
             // Kirim token sebagai cookie
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "lax",
-                maxAge: 15 * 24 * 60 * 60 * 1000
+                secure: isProd,
+                sameSite: isProd ? 'none' : 'lax',
+                maxAge: 30 * 24 * 60 * 60 * 1000
             });
 
             const resultResponse: TAPIResponse = {

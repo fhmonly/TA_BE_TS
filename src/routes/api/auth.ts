@@ -11,6 +11,6 @@ router.patch('/forgot-password/:token', authRoute.forgotPasswordChangePassword);
 router.get('/verify/:token', authRoute.verify);
 router.post('/re-send-email-activation/:token', authRoute.resendEmailVerification);
 router.get('/refresh-token', authRoute.refreshToken);
-router.get('/logout', authenticate, authRoute.logout);
+router.get('/logout', authRoute.logout);
 
 export default router

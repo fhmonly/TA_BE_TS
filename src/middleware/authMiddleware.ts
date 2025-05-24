@@ -8,7 +8,6 @@ const authenticate: RequestHandler = (req, res, next) => {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return next(createHttpError(401, "Access token required"));
     }
-
     const token = authHeader.split(" ")[1];
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {

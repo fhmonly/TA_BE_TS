@@ -56,3 +56,9 @@ export const selectProductByProductCode = (product_code: IProductTable['product_
         user_id,
     })
 }
+
+export const selectProductByProductCodes = (product_codes: IProductTable['product_code'][], user_id: IProductTable['user_id']) => {
+    return db<IProductTable>('products').where({
+        user_id,
+    }).whereIn('product_code', product_codes)
+}

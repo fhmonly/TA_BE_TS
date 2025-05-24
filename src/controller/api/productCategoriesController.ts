@@ -36,7 +36,6 @@ const getProductCategories = [
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const productCategories = await showAllProductCategory(req.user!.id)
-            console.log(productCategories)
             const result: TAPIResponse = {
                 success: true,
                 data: productCategories
