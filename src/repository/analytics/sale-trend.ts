@@ -1,6 +1,10 @@
 import { db } from "../../database/MySQL";
+import { ITransactionTable } from "../../types/db-model";
 
-export function selectThisYearSalesTrendMonthly() {
+export function selectThisYearSalesTrendMonthly(
+    user_id: ITransactionTable['user_id']
+
+) {
     return db('transactions')
         .select(
             db.raw("YEAR(transaction_date) AS year"),
@@ -8,11 +12,14 @@ export function selectThisYearSalesTrendMonthly() {
             db.raw("SUM(amount) AS amount")
         )
         .whereRaw("YEAR(transaction_date) = YEAR(CURDATE())") // filter tahun ini
+        .andWhere({ user_id })
         .groupByRaw("YEAR(transaction_date), MONTH(transaction_date)")
         .orderByRaw("YEAR(transaction_date), MONTH(transaction_date)")
 }
 
-export function selectThisYearSalesTrendWeekly() {
+export function selectThisYearSalesTrendWeekly(
+    user_id: ITransactionTable['user_id']
+) {
     return db('transactions')
         .select(
             db.raw("YEAR(transaction_date) AS year"),
@@ -20,6 +27,7 @@ export function selectThisYearSalesTrendWeekly() {
             db.raw("SUM(amount) AS amount")
         )
         .whereRaw("YEAR(transaction_date) = YEAR(CURDATE())")
+        .andWhere({ user_id })
         .groupByRaw("YEAR(transaction_date), WEEK(transaction_date, 1)")
         .orderByRaw("YEAR(transaction_date), WEEK(transaction_date, 1)")
 }

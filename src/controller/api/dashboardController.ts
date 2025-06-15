@@ -33,14 +33,14 @@ const dashboardTrendController = [
 
             const sales = await (
                 period_type === 'weekly' ?
-                    selectThisYearSalesTrendWeekly() :
-                    selectThisYearSalesTrendMonthly()
+                    selectThisYearSalesTrendWeekly(req.user!.id) :
+                    selectThisYearSalesTrendMonthly(req.user!.id)
             )
 
             const purchase = await (
                 period_type === 'weekly' ?
-                    selectThisYearRestockTrendWeekly() :
-                    selectThisYearRestockTrendMonthly()
+                    selectThisYearRestockTrendWeekly(req.user!.id) :
+                    selectThisYearRestockTrendMonthly(req.user!.id)
             )
 
             const result: TAPIResponse = {

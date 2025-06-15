@@ -1,6 +1,9 @@
 import { db } from "../../database/MySQL";
+import { IPurchaseTable } from "../../types/db-model";
 
-export function selectThisYearRestockTrendMonthly() {
+export function selectThisYearRestockTrendMonthly(
+    user_id: IPurchaseTable['user_id']
+) {
     return db('restocks')
         .select(
             db.raw('YEAR(buying_date) AS year'),
@@ -8,11 +11,14 @@ export function selectThisYearRestockTrendMonthly() {
             db.raw('SUM(amount) AS amount')
         )
         .whereRaw('YEAR(buying_date) = YEAR(CURDATE())')
+        .andWhere({ user_id })
         .groupByRaw('YEAR(buying_date), MONTH(buying_date)')
         .orderByRaw('YEAR(buying_date), MONTH(buying_date)')
 }
 
-export function selectThisYearRestockTrendWeekly() {
+export function selectThisYearRestockTrendWeekly(
+    user_id: IPurchaseTable['user_id']
+) {
     return db('restocks')
         .select(
             db.raw('YEAR(buying_date) AS year'),
@@ -20,6 +26,7 @@ export function selectThisYearRestockTrendWeekly() {
             db.raw('SUM(amount) AS amount')
         )
         .whereRaw('YEAR(buying_date) = YEAR(CURDATE())')
+        .andWhere({ user_id })
         .groupByRaw('YEAR(buying_date), WEEK(buying_date, 1)')
         .orderByRaw('YEAR(buying_date), WEEK(buying_date, 1)')
 }
