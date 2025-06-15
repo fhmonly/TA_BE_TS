@@ -21,8 +21,9 @@ export async function addTransactionRecords(data: {
             price: Number(p.selling_price),
         })
 
+        const stockAfter = (Number(dataMatched?.amount) || 0) - p.stock
         updateProductById(p.id, {
-            stock: (Number(dataMatched?.amount) || 0) - p.stock
+            stock: stockAfter < 1 ? 0 : stockAfter
         })
     })
     return insertsDataToTransaction(mergedData)

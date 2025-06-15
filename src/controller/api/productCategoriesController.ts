@@ -65,34 +65,6 @@ const deleteProductCategoryRoute = [
     }
 ]
 
-const updateProductCategory = [
-    param("id").notEmpty(),
-    body("category_name").notEmpty(),
-    expressValidatorErrorHandler,
-    async (req: Request, res: Response, next: NextFunction) => {
-        const reqParam = matchedData(req, { locations: ['params'] })
-        const reqBody = matchedData<IProductCategoryTable>(req, { locations: ['body'] })
-        try {
-            const newProductId = await updateProductCategoryById(reqParam.id, {
-                ...reqBody,
-                category_name: reqBody.category_name.toLowerCase()
-            })
-            const result: TAPIResponse = {
-                success: true,
-                message: 'Product category successfully updated.',
-                data: {
-                    productCategoryId: newProductId
-                }
-            }
-            res.json(result)
-        } catch (error: unknown) {
-            next(createHttpError(500, error as Error))
-        }
-
-    }
-]
-
-
 export default {
     addProductCategory, getProductCategories, deleteProductCategoryRoute
 }

@@ -1,5 +1,6 @@
 import { db } from "../database/MySQL";
 import { ITransactionTable } from "../types/db-model";
+import { getStartOfMonth, getStartOfWeek } from "../utils/core/date";
 
 export function insertsDataToTransaction(data: Partial<ITransactionTable>[]) {
     return db<ITransactionTable>('transactions').insert(data)
@@ -27,3 +28,51 @@ export const countSales = async (id_user: number) => {
 
     return parseInt(result?.count || '0');
 };
+
+export const selectLastMonthSales = async (user_id: number) => {
+    return db('transactions')
+        .whereRaw('MONTH(transaction_date) = MONTH(CURRENT_DATE() - INTERVAL 1 MONTH) AND YEAR(transaction_date) = YEAR(CURRENT_DATE() - INTERVAL 1 MONTH)')
+        .andWhere('user_id', user_id)
+        .sum('total_price as total')
+        .first<{
+            total: number
+        }>();
+}
+
+export const selectCurrentMonthSales = async (user_id: number) => {
+    return db('transactions')
+        .whereRaw('MONTH(transaction_date) = MONTH(CURRENT_DATE()) AND YEAR(transaction_date) = YEAR(CURRENT_DATE())')
+        .andWhere('user_id', user_id)
+        .sum('total_price as total')
+        .first<{
+            total: number
+        }>();
+}
+
+export function selectGroupedWeeklySales(productId: ITransactionTable['product_id']) {
+    return db('transactions')
+        .select(
+            db.raw("YEAR(transaction_date) as year"),
+            db.raw("WEEK(transaction_date, 1) as week"),
+            db.raw("SUM(amount) as amount")
+        )
+        .where('product_id', productId)
+        .andWhere('transaction_date', '<', getStartOfWeek(new Date()).toISOString())
+
+        .groupBy(['year', 'week'])
+        .orderBy(['year', 'week'])
+}
+
+export function selectGroupedMonthlySales(productId: ITransactionTable['product_id']) {
+    return db('transactions')
+        .select(
+            db.raw("YEAR(transaction_date) as year"),
+            db.raw("MONTH(transaction_date) as month"),
+            db.raw("SUM(amount) as amount")
+        )
+        .where('product_id', productId)
+        .andWhere('transaction_date', '<', getStartOfMonth(new Date()).toISOString())
+
+        .groupBy(['year', 'month'])
+        .orderBy(['year', 'month'])
+}

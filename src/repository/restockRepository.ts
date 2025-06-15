@@ -1,5 +1,6 @@
 import { db } from "../database/MySQL";
 import { IPurchaseTable } from "../types/db-model";
+import { getStartOfMonth, getStartOfWeek } from "../utils/core/date";
 
 export function insertsDataToRestock(data: Partial<IPurchaseTable>[]) {
     return db<IPurchaseTable>('restocks').insert(data)
@@ -27,3 +28,49 @@ export const countRestocks = async (id_user: number) => {
 
     return parseInt(result?.count || '0');
 };
+
+export const selectMonthlyRestockCount = (user_id: number) => {
+    return db('restocks')
+        .whereRaw('MONTH(buying_date) = MONTH(CURRENT_DATE()) AND YEAR(buying_date) = YEAR(CURRENT_DATE())')
+        .andWhere('user_id', user_id)
+        .sum('total_price as total')
+        .first<{
+            total: number
+        }>();
+}
+
+export const selectLastMonthRestockCount = (user_id: number) => {
+    return db('restocks')
+        .whereRaw('MONTH(buying_date) = MONTH(CURRENT_DATE() - INTERVAL 1 MONTH) AND YEAR(buying_date) = YEAR(CURRENT_DATE() - INTERVAL 1 MONTH)')
+        .andWhere('user_id', user_id)
+        .sum('total_price as total')
+        .first<{
+            total: number
+        }>();
+}
+
+export function selectGroupedWeeklyPurchase(productId: IPurchaseTable['product_id']) {
+    return db<IPurchaseTable>('restocks')
+        .select(
+            db.raw("YEAR(buying_date) as year"),
+            db.raw("WEEK(buying_date, 1) as week"),
+            db.raw("SUM(amount) as amount")
+        )
+        .where('product_id', productId)
+        .andWhere('buying_date', '<', getStartOfWeek(new Date()).toISOString())
+        .groupBy(['year', 'week'])
+        .orderBy(['year', 'week'])
+}
+
+export function selectGroupedMonthlyPurchase(productId: IPurchaseTable['product_id']) {
+    return db<IPurchaseTable>('restocks')
+        .select(
+            db.raw("YEAR(buying_date) as year"),
+            db.raw("MONTH(buying_date) as month"),
+            db.raw("SUM(amount) as amount")
+        )
+        .where('product_id', productId)
+        .andWhere('buying_date', '<', getStartOfMonth(new Date()).toISOString())
+        .groupBy(['year', 'month'])
+        .orderBy(['year', 'month'])
+}

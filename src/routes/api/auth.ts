@@ -1,7 +1,6 @@
 import express from 'express'
 var router = express.Router();
 import authRoute from '../../controller/api/authController';
-import authenticate from '../../middleware/authMiddleware';
 
 router.post('/register', authRoute.register);
 router.post('/login', authRoute.login);

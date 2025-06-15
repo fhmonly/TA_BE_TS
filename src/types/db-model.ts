@@ -24,7 +24,8 @@ export interface IProductTable {
     selling_price: number | null;
     product_category_id: number | null;
     user_id: number;
-    deleted: boolean
+    deleted: boolean;
+    low_stock_limit: number;
 }
 
 export interface ISupplierTable {
@@ -58,18 +59,34 @@ export interface ITransactionTable {
 
 export interface IPredictionTable {
     id: number;
-    stock_sold: number;
-    stock_predicted: number;
-    type: string;
-    accuracy: number;
-    user_id: number;
+    prediction: number;
+    lower_bound: number;
+    upper_bound: number;
+    rmse: number;
+    mape: number;
     product_id: number;
+    user_id: number;
+    expired: string; // bisa juga pakai `Date` kalau langsung di-parse
+    period_type: 'weekly' | 'monthly';
+    prediction_source: 'sales' | 'purchases';
 }
 
-export interface IUserFileTable {
+export interface IPredictionModelTable {
     id: number;
-    file_name: string;
-    saved_file_name: string;
-    is_converted: boolean;
+    ar_p: number;
+    ma_q: number;
+    differencing_d: number;
+    period_type: 'weekly' | 'monthly';
+    prediction_source: 'sales' | 'purchases';
+    expired: string; // bisa juga pakai `Date` kalau langsung di-parse
+    product_id: number;
     user_id: number;
+}
+
+export interface IDummiesTable {
+    id: number;
+    product_id: number;
+    fake_json: number[] | null;
+    period_type: 'weekly' | 'monthly';
+    trx_type: 'sales' | 'purchases';
 }

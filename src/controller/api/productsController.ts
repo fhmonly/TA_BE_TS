@@ -5,7 +5,8 @@ import { TAPIResponse } from "../../types/core/http"
 import { IProductTable, ISupplierTable } from "../../types/db-model"
 import createHttpError from "http-errors"
 import parsePhoneNumberFromString from "libphonenumber-js"
-import { createProduct, deleteProductById, getProductByProductCode, getProducts, showProductById, updateProductById } from "../../services/productServices"
+import { createProduct, deleteProductById, getLowStockProducts, getProductByProductCode, getProducts, showProductById, updateProductById } from "../../services/productServices"
+import { selectShortDataAllProduct } from "../../repository/productsRepository"
 
 const addProduct = [
     body('product_code').notEmpty().isString(),
@@ -163,4 +164,39 @@ const getProductByProductCodeRoute = [
     }
 ]
 
-export default { addProduct, showAllProducts, getProductDetail, updateProductRoute, deleteProductRoute, getProductByProductCodeRoute }
+const getLowStockProduct = [
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const product = await getLowStockProducts(req.user!.id)
+            const result: TAPIResponse = {
+                success: true,
+                data: product
+            }
+            res.json(result)
+        } catch (error) {
+            next(createHttpError(500, error as Error))
+        }
+    }
+]
+
+const getAllProduct = [
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const product = await selectShortDataAllProduct(req.user!.id)
+            const result: TAPIResponse = {
+                success: true,
+                data: product
+            }
+            res.json(result)
+        } catch (error) {
+            next(createHttpError(500, error as Error))
+        }
+    }
+]
+
+export default {
+    addProduct, showAllProducts,
+    getProductDetail, updateProductRoute,
+    deleteProductRoute, getProductByProductCodeRoute,
+    getLowStockProduct, getAllProduct
+}

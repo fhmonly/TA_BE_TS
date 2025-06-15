@@ -3,10 +3,9 @@ var router = express.Router();
 import productController from '../../controller/api/productCategoriesController';
 import authenticate from '../../middleware/authMiddleware';
 
-router.use('/', authenticate)
-router.post('/product-category', productController.addProductCategory);
-router.post('/product-category/:id', productController.addProductCategory);
-router.get('/product-categories', productController.getProductCategories);
-router.delete('/product-category/:id', productController.deleteProductCategoryRoute);
+router.post('/product-category', authenticate, productController.addProductCategory);
+router.post('/product-category/:id', authenticate, productController.addProductCategory);
+router.get('/product-categories', authenticate, productController.getProductCategories);
+router.delete('/product-category/:id', authenticate, productController.deleteProductCategoryRoute);
 
 export default router
