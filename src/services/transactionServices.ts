@@ -1,4 +1,4 @@
-import { countSales, insertsDataToTransaction, selectAllSalesHistory } from "../repository/transactionRepository";
+import { countSales, insertsDataToTransaction, selectAllSalesHistory } from "../repository/transaction/sales";
 import { IProductTable, ITransactionTable } from "../types/db-model";
 import { getProductByProductCodes, updateProductById } from "./productServices";
 
@@ -21,7 +21,7 @@ export async function addTransactionRecords(data: {
             price: Number(p.selling_price),
         })
 
-        const stockAfter = (Number(dataMatched?.amount) || 0) - p.stock
+        const stockAfter = p.stock - (Number(dataMatched?.amount) || 0)
         updateProductById(p.id, {
             stock: stockAfter < 1 ? 0 : stockAfter
         })

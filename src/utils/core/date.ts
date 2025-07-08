@@ -26,3 +26,7 @@ export function getExpiredDateFromMonth(dateInput: string | Date, period = 1) {
 export function getExpiredDateFromWeek(dateInput: string | Date, period = 1) {
     return getStartOfWeek(dateInput).add(period, 'week').endOf('day').format('YYYY-MM-DD HH:mm:ss')
 }
+
+export function getTotalDaysInNextMonth(dateInput: string | Date = new Date()) {
+    return getStartOfMonth(dateInput).add(1, 'month').daysInMonth()
+}

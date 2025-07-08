@@ -5,13 +5,15 @@ import { IPredictionTable } from "../../types/db-model"
 export async function buildManualPrediction(
     csv_string: string,
     prediction_period: IPredictionTable['period_type'],
-    model: [number, number, number]
+    model: [number, number, number],
+    future_step: number = 1
 ) {
     const result = await makePrivateManualPrediction({
         csv_string,
         prediction_period,
         value_column: 'amount',
-        arima_model: model
+        arima_model: model,
+        future_step
     })
 
     if (!result) throw createHttpError(422, 'Prediksi gagal: model tidak mengembalikan hasil.')

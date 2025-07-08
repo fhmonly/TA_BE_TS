@@ -1,6 +1,6 @@
-import { db } from "../database/MySQL";
-import { ITransactionTable } from "../types/db-model";
-import { getStartOfMonth, getStartOfWeek } from "../utils/core/date";
+import { db } from "../../database/MySQL";
+import { ITransactionTable } from "../../types/db-model";
+import { getStartOfMonth, getStartOfWeek } from "../../utils/core/date";
 
 export function insertsDataToTransaction(data: Partial<ITransactionTable>[]) {
     return db<ITransactionTable>('transactions').insert(data)
@@ -49,6 +49,27 @@ export const selectCurrentMonthSales = async (user_id: number) => {
         }>();
 }
 
+export function selectGroupedDailySales(
+    productId: ITransactionTable['product_id'],
+    endOfPeriod: 'last-week' | 'last-month'
+) {
+    let startOfDay
+    if (endOfPeriod === 'last-month')
+        startOfDay = getStartOfMonth(new Date()).toISOString()
+    else (endOfPeriod === 'last-week')
+    startOfDay = getStartOfWeek(new Date()).toISOString()
+
+    return db<ITransactionTable>('transactions')
+        .select(
+            db.raw('DATE(transaction_date) AS date'),
+            db.raw('SUM(amount) AS total_amount')
+        )
+        .where('product_id', productId)
+        .andWhere('transaction_date', '<', startOfDay)
+        .groupByRaw('DATE(transaction_date)')
+        .orderBy('date');
+}
+
 export function selectGroupedWeeklySales(productId: ITransactionTable['product_id']) {
     return db('transactions')
         .select(
@@ -72,6 +93,7 @@ export function selectGroupedMonthlySales(productId: ITransactionTable['product_
         )
         .where('product_id', productId)
         .andWhere('transaction_date', '<', getStartOfMonth(new Date()).toISOString())
+
 
         .groupBy(['year', 'month'])
         .orderBy(['year', 'month'])

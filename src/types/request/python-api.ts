@@ -4,6 +4,7 @@ type TPythonBasePredictionRequest = {
     value_column: string
     date_column?: string
     date_regroup?: boolean
+    future_step: number
 }
 
 type TPythonBasePredictionResponse = {

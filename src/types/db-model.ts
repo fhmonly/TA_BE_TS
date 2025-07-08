@@ -59,9 +59,9 @@ export interface ITransactionTable {
 
 export interface IPredictionTable {
     id: number;
-    prediction: number;
-    lower_bound: number;
-    upper_bound: number;
+    prediction: number[];
+    lower_bound: number[];
+    upper_bound: number[];
     rmse: number;
     mape: number;
     product_id: number;

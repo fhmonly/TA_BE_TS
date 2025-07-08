@@ -1,6 +1,6 @@
-import { db } from "../database/MySQL";
-import { IPurchaseTable } from "../types/db-model";
-import { getStartOfMonth, getStartOfWeek } from "../utils/core/date";
+import { db } from "../../database/MySQL";
+import { IPurchaseTable } from "../../types/db-model";
+import { getStartOfMonth, getStartOfWeek } from "../../utils/core/date";
 
 export function insertsDataToRestock(data: Partial<IPurchaseTable>[]) {
     return db<IPurchaseTable>('restocks').insert(data)
@@ -47,6 +47,27 @@ export const selectLastMonthRestockCount = (user_id: number) => {
         .first<{
             total: number
         }>();
+}
+
+export function selectGroupedDailyPurchase(
+    productId: IPurchaseTable['product_id'],
+    endOfPeriod: 'last-week' | 'last-month'
+) {
+    let startOfDay
+    if (endOfPeriod === 'last-month')
+        startOfDay = getStartOfMonth(new Date()).toISOString()
+    else (endOfPeriod === 'last-week')
+    startOfDay = getStartOfWeek(new Date()).toISOString()
+
+    return db<IPurchaseTable>('restocks')
+        .select(
+            db.raw('DATE(buying_date) AS date'),
+            db.raw('SUM(amount) AS total_amount')
+        )
+        .where('product_id', productId)
+        .andWhere('buying_date', '<', startOfDay)
+        .groupByRaw('DATE(buying_date)')
+        .orderBy('date');
 }
 
 export function selectGroupedWeeklyPurchase(productId: IPurchaseTable['product_id']) {

@@ -4,12 +4,14 @@ import { IPredictionTable } from "../../types/db-model"
 
 export async function buildAutoPrediction(
     csv_string: string,
-    prediction_period: IPredictionTable['period_type']
+    prediction_period: IPredictionTable['period_type'],
+    future_step: number = 1
 ) {
     const result = await makePrivateAutoPrediction({
         csv_string,
         prediction_period,
         value_column: 'amount',
+        future_step
     })
 
     if (!result) throw createHttpError(422, 'Prediksi gagal: model tidak mengembalikan hasil.')

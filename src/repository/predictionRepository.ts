@@ -1,5 +1,5 @@
 import { db } from "../database/MySQL";
-import { IPredictionTable, IProductTable, ITransactionTable } from "../types/db-model";
+import { IPredictionModelTable, IPredictionTable, IProductTable, ITransactionTable } from "../types/db-model";
 import { TGroupedProductSales } from "../types/db/product-sales";
 import { selectProductsByUserId } from "./productsRepository";
 
@@ -86,4 +86,31 @@ export async function insertPrediction(data: Partial<IPredictionTable>) {
 
 export function updatePrediction(id: IPredictionTable['id'], data: Partial<IPredictionTable>) {
     return db<IPredictionTable>('predictions').where({ id }).update(data)
+}
+
+export function selectDetailPrediction(
+    product_id: IPredictionTable['product_id'],
+    period_type: IPredictionTable['period_type'],
+    prediction_source: IPredictionTable['prediction_source'],
+) {
+    return db<IProductTable>('products')
+        .leftJoin('predictions', function () {
+            this.on('predictions.product_id', '=', 'products.id')
+                .andOn(db.raw('predictions.period_type = ?', [period_type]))
+                .andOn(db.raw('predictions.prediction_source = ?', [prediction_source]))
+                .andOn(db.raw('predictions.expired >= ?', [new Date().toISOString()]));
+        })
+        .where('products.id', product_id)
+        .select(
+            'products.product_code',
+            'products.product_name',
+            'products.stock',
+            'products.selling_price',
+            'products.buying_price',
+            'predictions.prediction',
+            'predictions.lower_bound',
+            'predictions.upper_bound',
+            'predictions.mape',
+            'predictions.rmse'
+        ).first();
 }

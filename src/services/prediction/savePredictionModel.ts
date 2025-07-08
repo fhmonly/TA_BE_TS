@@ -9,12 +9,13 @@ export async function savePredictionModel(
     product_id: IPredictionTable['product_id'],
     prediction_period: IPredictionTable['period_type'],
     source: IPredictionTable['prediction_source'],
-    user_id: IPredictionTable['user_id']
+    user_id: IPredictionTable['user_id'],
+    expiration_interval: number
 ) {
     const [ar_p, differencing_d, ma_q] = prediction_result.arima_order
     const expired = prediction_period === 'monthly' ?
-        getExpiredDateFromMonth(new Date(), 3) :
-        getExpiredDateFromWeek(new Date(), 3)
+        getExpiredDateFromMonth(new Date(), expiration_interval) :
+        getExpiredDateFromWeek(new Date(), expiration_interval)
 
     if (!model?.id) {
         await insertPredictionModel({

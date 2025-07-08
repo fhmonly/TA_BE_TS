@@ -1,6 +1,6 @@
 import { countProducts, selectLowStockProductCount } from "../repository/productsRepository"
-import { selectLastMonthRestockCount, selectMonthlyRestockCount } from "../repository/restockRepository"
-import { selectLastMonthSales, selectCurrentMonthSales } from "../repository/transactionRepository"
+import { selectLastMonthRestockCount, selectMonthlyRestockCount } from "../repository/transaction/purchase"
+import { selectCurrentMonthSales, selectLastMonthSales } from "../repository/transaction/sales"
 import { calculateGrowth } from '../utils/math/calculateGrowth'
 
 export async function getDashboardData(user_id: number) {

@@ -1,4 +1,4 @@
-import { countRestocks, insertsDataToRestock, selectAllRestockHistory } from "../repository/restockRepository";
+import { countRestocks, insertsDataToRestock, selectAllRestockHistory } from "../repository/transaction/purchase";
 import { IProductTable, IPurchaseTable } from "../types/db-model";
 import { getProductByProductCodes, updateProductById } from "./productServices";
 

@@ -11,6 +11,7 @@ export function selectLatestPredictions(
         .join('product_categories as pc', 'pr.product_category_id', 'pc.id')
         .select(
             'pr.product_name',
+            'pr.stock',
             'p.mape',
             'p.prediction',
             'pc.category_name',

@@ -8,4 +8,6 @@ router.get('/saved-predictions/purchases/:period_type', authenticate, prediction
 router.get('/saved-predictions/sales/:period_type', authenticate, predictionController.getSavedSalePredictions)
 router.post('/purchase-prediction/:product_id', authenticate, predictionController.purchasePrediction)
 router.post('/sales-prediction/:product_id', authenticate, predictionController.salesPrediction)
+router.post('/smart-prediction/:product_id', authenticate, predictionController.smartPrediction)
+router.post('/detail-prediction', authenticate, predictionController.predictionDetail)
 export default router
