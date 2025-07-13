@@ -73,24 +73,24 @@ export async function getPreparedCSVString(
         }
     }
 
-    if (groupedData.length < 10) {
-        if (source === 'purchases') {
-            groupedData = await selectGroupedDailyPurchase(
-                product_id,
-                prediction_period === 'weekly' ? 'last-week' : 'last-month'
-            )
-        } else {
+    if (
+        groupedData.length < 12
+    ) {
+        if (source === 'sales') {
             groupedData = await selectGroupedDailySales(
                 product_id,
                 prediction_period === 'weekly' ? 'last-week' : 'last-month'
             )
+
+            if (groupedData.length < 30) {
+                throw createHttpError(422, `Minimal lakukan 30 transaksi penjualan harian pada ${prediction_period === 'weekly' ? 'minggu' : 'bulan'} sebelumnya untuk dapat melakukan prediksi`)
+            }
+            returnValue.data_freq = 'daily'
+        } else {
+            throw createHttpError(422, `Minimal lakukan 12 transaksi pembelian ${prediction_period === 'weekly' ? 'mingguan' : 'bulanan'} untuk dapat melakukan prediksi`)
         }
-        returnValue.data_freq = 'daily'
     }
 
-    if (groupedData.length < 30) {
-        throw createHttpError(422, `Minimal lakukan 30 transaksi ${source === 'sales' ? 'penjualan' : 'pembelian'} harian pada ${prediction_period === 'weekly' ? 'minggu' : 'bulan'} sebelumnya untuk dapat melakukan prediksi`)
-    }
 
     let data = groupedData.map(v => ({ amount: v.amount }))
 

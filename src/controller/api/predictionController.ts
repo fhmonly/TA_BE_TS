@@ -247,7 +247,7 @@ const smartPrediction = [
                     prediction_period,
                     prediction_source,
                     req.user!.id,
-                    data_freq === 'daily' ? 1 : 3
+                    data_freq === 'daily' ? 1 : 3 // 1 bulan atau 3 bulan
                 )
             } else {
                 const arimaModel: [number, number, number] = [model!.ar_p, model!.differencing_d, model!.ma_q]

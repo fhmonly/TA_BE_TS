@@ -17,9 +17,9 @@ export async function persistPrediction(
 
     const record = {
         ...previous,
-        lower_bound: prediction_result.lower.map(v => Math.round(v), 0),
-        prediction: prediction_result.prediction.map(v => Math.round(v)),
-        upper_bound: prediction_result.upper.map(v => Math.round(v)),
+        lower_bound: JSON.stringify(prediction_result.lower.map(v => Math.round(v), 0)),
+        prediction: JSON.stringify(prediction_result.prediction.map(v => Math.round(v))),
+        upper_bound: JSON.stringify(prediction_result.upper.map(v => Math.round(v))),
         period_type: prediction_period,
         prediction_source: source,
         product_id,
@@ -28,6 +28,8 @@ export async function persistPrediction(
         rmse: Math.round((prediction_result as TPythonAutoPredictionResponse)?.rmse || previous?.rmse || 0),
         expired
     }
+
+    console.log(record)
 
     if (!!previous?.id) {
         await updatePrediction(previous.id, record)
