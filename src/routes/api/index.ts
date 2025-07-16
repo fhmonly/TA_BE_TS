@@ -9,6 +9,7 @@ import dashboardEndpoint from './dashboard'
 import predictionEndpoint from './prediction'
 import productEndpoint from './product'
 import dummyEndpoint from './dummy'
+import envEndpoint from './env'
 import authenticate from '../../middleware/authMiddleware';
 
 router.get('/', function (req, res, next) {
@@ -31,5 +32,6 @@ router.use('/', trxEndpoint)
 router.use('/', dashboardEndpoint)
 router.use('/', predictionEndpoint)
 router.use('/', dummyEndpoint)
+router.use('/', envEndpoint)
 
 export default router;

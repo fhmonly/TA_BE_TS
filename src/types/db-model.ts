@@ -90,3 +90,9 @@ export interface IDummiesTable {
     period_type: 'weekly' | 'monthly';
     trx_type: 'sales' | 'purchases';
 }
+
+export interface IEnvTable {
+    id: number
+    name: string
+    value: string
+}
