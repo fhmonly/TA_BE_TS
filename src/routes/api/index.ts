@@ -23,15 +23,15 @@ router.get('/is-authenticated', (req, res) => {
 })
 
 
-router.post('/register', authRoute.register);
-router.post('/login', authRoute.login);
-router.post('/forgot-password', authRoute.forgotPasswordSendEmail);
-router.get('/forgot-password/:token', authRoute.forgotPasswordVerifyToken);
-router.patch('/forgot-password/:token', authRoute.forgotPasswordChangePassword);
-router.get('/verify/:token', authRoute.verify);
-router.post('/re-send-email-activation/:token', authRoute.resendEmailVerification);
-router.get('/refresh-token', authRoute.refreshToken);
-router.get('/logout', authenticate, authRoute.logout);
+router.post('/auth/register', authRoute.register);
+router.post('/auth/login', authRoute.login);
+router.post('/auth/forgot-password', authRoute.forgotPasswordSendEmail);
+router.get('/auth/forgot-password/:token', authRoute.forgotPasswordVerifyToken);
+router.patch('/auth/forgot-password/:token', authRoute.forgotPasswordChangePassword);
+router.get('/auth/verify/:token', authRoute.verify);
+router.post('/auth/re-send-email-activation/:token', authRoute.resendEmailVerification);
+router.get('/auth/refresh-token', authRoute.refreshToken);
+router.get('/auth/logout', authenticate, authRoute.logout);
 
 router.get('/dashboard', authenticate, dashboardController.dashboardDataController)
 router.get('/dashboard/trend/:period_type', authenticate, dashboardController.dashboardTrendController)
