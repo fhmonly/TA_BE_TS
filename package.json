@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ngrok/ngrok": "^1.5.1",
+    "@vendia/serverless-express": "^4.12.6",
     "amqplib": "^0.10.3",
     "axios": "^1.9.0",
     "bcrypt": "^5.1.1",
