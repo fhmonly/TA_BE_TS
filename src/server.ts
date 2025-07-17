@@ -1,4 +1,4 @@
-import app from '.';
+import app from './app';
 import http from 'http';
 import os from 'os';
 import { getLocalIP } from './dev-core';

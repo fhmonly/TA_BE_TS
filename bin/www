@@ -2,7 +2,7 @@
 
 const http = require('http');
 const debug = require('debug')('order-services-node:server');
-const app = require('./build/index.js').default;
+const app = require('./build/app').default;
 
 function normalizePort(val) {
   const port = parseInt(val, 10);
