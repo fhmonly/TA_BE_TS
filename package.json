@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "dev": "npx ts-node-dev --respawn --transpile-only ./src/server.ts",
+    "dev": "npx ts-node-dev --respawn --transpile-only ./src/vercel-server.ts",
     "preview": "npx ts-node-dev ./bin/build/index.js",
     "build": "tsc --build"
   },
