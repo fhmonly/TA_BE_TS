@@ -21,7 +21,12 @@ const app = express();
 const localIP = getLocalIP()
 
 // 🚨 1. Setup Allowed Origins
-const allowedOrigins = ['http://localhost:3000', 'https://myapp.com', `http://${localIP}:3000`];
+const allowedOrigins = [
+  process.env.HOST,
+  'https://stokin.vercel.app',
+  'http://localhost:3000',
+  `http://${localIP}:3000`,
+];
 
 const corsOptions: cors.CorsOptions = {
   origin(origin, callback) {
